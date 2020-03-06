@@ -18,7 +18,7 @@
         android:id="@+id/countryFragment"
         android:name="com.atilsamancioglu.kotlincountries.view.CountryFragment"
         android:label="fragment_country"
-        tools:layout="@layout/fragment_country" >
+        >
         <action
             android:id="@+id/action_countryFragment_to_feedFragment"
             app:destination="@id/feedFragment" />
