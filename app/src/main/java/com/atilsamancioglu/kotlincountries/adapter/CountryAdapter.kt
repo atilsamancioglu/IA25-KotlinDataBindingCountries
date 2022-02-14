@@ -64,8 +64,8 @@ class CountryAdapter(val countryList: ArrayList<Country>): RecyclerView.Adapter<
 
     override fun onCountryClicked(v: View) {
         val uuid = v.countryUuidText.text.toString().toInt()
-        val action = FeedFragmentDirections.actionFeedFragmentToCountryFragment(uuid)
-        //action.countryUuid
+        val action = FeedFragmentDirections.actionFeedFragmentToCountryFragment()
+        action.countryUuid = uuid
         Navigation.findNavController(v).navigate(action)
 
     }
