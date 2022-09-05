@@ -3,8 +3,10 @@ package com.atilsamancioglu.kotlincountries.viewmodel
 import android.app.Application
 import android.content.SharedPreferences
 import android.widget.Toast
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.atilsamancioglu.kotlincountries.model.Country
 import com.atilsamancioglu.kotlincountries.service.CountryAPIService
 import com.atilsamancioglu.kotlincountries.service.CountryDatabase
@@ -17,7 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-class FeedViewModel(application: Application) : BaseViewModel(application) {
+class FeedViewModel(application: Application) : AndroidViewModel(application) {
 
     private val countryApiService = CountryAPIService()
     private val disposable = CompositeDisposable()
@@ -45,7 +47,7 @@ class FeedViewModel(application: Application) : BaseViewModel(application) {
 
     private fun getDataFromSQLite() {
         countryLoading.value = true
-        launch {
+        viewModelScope.launch {
             val countries = CountryDatabase(getApplication()).countryDao().getAllCountries()
             showCountries(countries)
             Toast.makeText(getApplication(),"Countries From SQLite",Toast.LENGTH_LONG).show()
@@ -82,7 +84,7 @@ class FeedViewModel(application: Application) : BaseViewModel(application) {
     }
 
     private fun storeInSQLite(list: List<Country>) {
-        launch {
+        viewModelScope.launch {
             val dao = CountryDatabase(getApplication()).countryDao()
             dao.deleteAllCountries()
             val listLong = dao.insertAll(*list.toTypedArray()) // -> list -> individual
