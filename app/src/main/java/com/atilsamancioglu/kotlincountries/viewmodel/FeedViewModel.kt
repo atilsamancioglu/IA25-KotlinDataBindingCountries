@@ -16,7 +16,9 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
 class FeedViewModel(application: Application) : AndroidViewModel(application) {
@@ -47,10 +49,12 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun getDataFromSQLite() {
         countryLoading.value = true
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val countries = CountryDatabase(getApplication()).countryDao().getAllCountries()
-            showCountries(countries)
-            Toast.makeText(getApplication(),"Countries From SQLite",Toast.LENGTH_LONG).show()
+            withContext(Dispatchers.Main) {
+                showCountries(countries)
+                Toast.makeText(getApplication(), "Countries From SQLite", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -84,7 +88,7 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun storeInSQLite(list: List<Country>) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val dao = CountryDatabase(getApplication()).countryDao()
             dao.deleteAllCountries()
             val listLong = dao.insertAll(*list.toTypedArray()) // -> list -> individual
@@ -93,8 +97,10 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
                 list[i].uuid = listLong[i].toInt()
                 i = i + 1
             }
+            withContext(Dispatchers.Main) {
+                showCountries(list)
+            }
 
-            showCountries(list)
         }
 
         customPreferences.saveTime(System.nanoTime())

@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.atilsamancioglu.kotlincountries.model.Country
 import com.atilsamancioglu.kotlincountries.service.CountryDatabase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CountryViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -15,10 +17,12 @@ class CountryViewModel(application: Application) : AndroidViewModel(application)
 
     fun getDataFromRoom(uuid: Int) {
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val dao = CountryDatabase(getApplication()).countryDao()
             val country = dao.getCountry(uuid)
-            countryLiveData.value = country
+            withContext(Dispatchers.Main) {
+                countryLiveData.value = country
+            }
         }
     }
 }
